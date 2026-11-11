@@ -4,6 +4,8 @@
 
 Team: James Pease, Natalie Mukoda, Angela Flores Figueroa
 
+My role: I led the project from start to finish, coordinating the team and completing the majority of the analysis and modeling, from data cleaning through model comparison and the final recommendation.
+
 ## The Problem
 
 The U.S. Small Business Administration guarantees part of each small-business loan, but banks still lose money when a borrower defaults. Using SBA national data, we built models to classify loan applications as lower risk (approve) or higher risk (deny), choosing the model and approval cutoff that **maximize the bank's net profit**, not just accuracy.

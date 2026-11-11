@@ -10,7 +10,7 @@ This repository showcases selected projects. Work built on company data has been
 ## Featured Projects
 
 ### Store Cost Prediction Models
-[`store-cost-prediction`](store-cost-prediction)
+[`Store_Cost_Prediction`](Store_Cost_Prediction)
 
 Predicts expected monthly food and labor costs for each store from revenue and company, then flags stores whose actual costs break from the prediction.
 
@@ -21,7 +21,7 @@ Predicts expected monthly food and labor costs for each store from revenue and c
 - **Run it:** `pip install -r requirements.txt`, then `python cost_prediction.py`
 
 ### SBA Loan Default Prediction (MSBA Capstone Competition)
-[`sba-loan-default-prediction`](sba-loan-default-prediction)
+[`MSBA Project`](MSBA%20Project)
 
 Team project for the 2024 CSU Systemwide Business Analytics Competition: predicting which of 899,164 SBA-guaranteed loans would default, and choosing the model and approval cutoff that maximize a bank's net profit.
 
@@ -31,7 +31,7 @@ Team project for the 2024 CSU Systemwide Business Analytics Competition: predict
 - **Stack:** Python (pandas, scikit-learn), R
 
 ### Dokkan Battle Damage Calculator
-[`dokkan-damage-calculator`](dokkan-damage-calculator)
+[`Dokkan_Battle_Damage_Calculator`](Dokkan_Battle_Damage_Calculator)
 
 A survival calculator for *Dragon Ball Z Dokkan Battle* that models whether a unit survives an enemy super attack, built because in-game stat screens don't show the math.
 
@@ -42,7 +42,7 @@ A survival calculator for *Dragon Ball Z Dokkan Battle* that models whether a un
 - **Run it:** `python dokkan_calculator.py`
 
 ### Pokémon Shiny Hunting Analytics
-[`pokemon-shiny-analytics`](pokemon-shiny-analytics)
+[`Pokemon_Shiny_Analytics`](Pokemon_Shiny_Analytics)
 
 Data tools behind my personal shiny living-dex tracker (1,100+ of 1,362 forms collected).
 
@@ -50,7 +50,7 @@ Data tools behind my personal shiny living-dex tracker (1,100+ of 1,362 forms co
 - **Pokédex scraper (`scrape_pokedex.py`):** scrapes national and regional Pokédex lists into CSV as the master list for the tracker, with polite request delays and validation that fails loudly if the page layout changes
 - **Stack:** Python, NumPy, pandas, matplotlib, requests, BeautifulSoup
 
-![Shiny odds chart](pokemon-shiny-analytics/shiny_odds.png)
+![Shiny odds chart](Pokemon_Shiny_Analytics/shiny_odds.png)
 
 ## Skills
 

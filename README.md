@@ -21,7 +21,7 @@ Predicts expected monthly food and labor costs for each store from revenue and c
 - **Run it:** `pip install -r requirements.txt`, then `python cost_prediction.py`
 
 ### SBA Loan Default Prediction (MSBA Capstone Competition)
-[`MSBA Project`](MSBA%20Project)
+[`MSBA_Project`](MSBA_Project)
 
 Team project for the 2024 CSU Systemwide Business Analytics Competition: predicting which of 899,164 SBA-guaranteed loans would default, and choosing the model and approval cutoff that maximize a bank's net profit.
 

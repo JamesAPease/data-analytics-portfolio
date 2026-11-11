@@ -1,69 +1,60 @@
-# James Pease — Data Analytics Portfolio
+# Should This Loan Be Approved? Predicting SBA Loan Default
 
-Senior Data Analyst | Analytics Engineer · Orange County, CA
-[LinkedIn](https://www.linkedin.com/in/james-a-pease/) · james.a.pease@gmail.com
+**2024 CSU Systemwide Business Analytics Competition** · M.S. Business Analytics, California State University, Sacramento
 
-I build and own the analytics systems executives use to run the business. As the sole data analyst for a 200+ location restaurant franchisee, I manage the full stack: SQL Server, automated Azure pipelines, Python predictive models, and 20+ Power BI dashboards across finance, operations, HR, risk, and marketing.
+Team: James Pease, Natalie Mukoda, Angela Flores Figueroa
 
-This repository showcases selected projects. Work built on company data has been rewritten to run on **synthetic data**, so the methods are shown without exposing any confidential information.
+## The Problem
 
-## Featured Projects
+The U.S. Small Business Administration guarantees part of each small-business loan, but banks still lose money when a borrower defaults. Using SBA national data, we built models to classify loan applications as lower risk (approve) or higher risk (deny), choosing the model and approval cutoff that **maximize the bank's net profit**, not just accuracy.
 
-### Store Cost Prediction Models
-`/Financial_Cost_Prediction`
+## Data
 
-Predicts expected monthly food and labor costs for each store from revenue and company, then flags stores whose actual costs break from the prediction.
+- **Source:** U.S. SBA National Data, 1987 to 2014, published by Li, Mickel, and Taylor (2018) for teaching and publicly available on Kaggle (not included here due to size)
+- **Size:** 899,164 loans, 27 variables
+- **Target:** `MIS_Status`, paid in full (0) or charged off (1)
 
-- **Pipeline:** loads multi-year ledger data, unpivots and joins it to a chart of accounts and store master table, and aggregates it to store-month level
-- **Models:** Linear Regression, Ridge (alpha tuned with GridSearchCV), and Random Forest, compared on RMSE and R²
-- **Results on production data:** R² of 0.94 for food cost and 0.87 for labor cost; the Random Forest version runs each month-end and loads predictions to SQL Server for Power BI reporting
-- **Stack:** Python, pandas, scikit-learn (the production version also uses SQLAlchemy to read from Azure SQL)
-- **Run it:** `pip install -r requirements.txt`, then `python cost_prediction.py`
+## Approach
 
-### SBA Loan Default Prediction (MSBA Capstone Competition)
-`/MSBA_SBA_Loan_Default`
+| Step | Notebook |
+| --- | --- |
+| Data cleaning: removed identifiers, redundant fields, and anything unknown at approval time (which would leak the outcome); addressed multicollinearity | `1 - Cleaning Data` |
+| Classification trees, plus bagging, boosting, and random forest; tree feature importance used to trim weak predictors | `2 - Classification Trees` |
+| k-Nearest Neighbors | `3 - KNN Group Project` |
+| Logistic regression (statsmodels, Ridge, Lasso), plus Elastic Net in R | `4 - Logistic Regression`, `4-Logit-Models(Elastic-Net).pdf` |
+| Discriminant analysis | `5 - Discriminant Analysis` |
+| Neural networks | `6 - Neural Networks` |
+| Model comparison on precision, recall, F1, specificity, and net profit | `7 - Model Comparison` |
+| Final model: performance, lift and ROC charts, and the profit-maximizing cutoff | `8 - Question 3` |
 
-Team project for the 2024 CSU Systemwide Business Analytics Competition: predicting which of 899,164 SBA-guaranteed loans would default, and choosing the model and approval cutoff that maximize a bank's net profit.
+Key design choices:
 
-- **Models:** classification trees, bagging, boosting, random forest, KNN, logistic regression (Ridge, Lasso, Elastic Net), discriminant analysis, and neural networks
-- **Decision rule:** profit-based cutoffs with class weights reflecting the higher cost of approving a loan that defaults
-- **Includes a Lessons Learned review** of the methodology, written after graduation
-- **Stack:** Python (pandas, scikit-learn), R
+- **60/40 train/validation split**, predictors normalized where needed, and hyperparameters tuned with cross-validation
+- **Class weights** (5 to 1 on defaults) because approving a loan that defaults costs far more than turning away a good one
+- **Profit-based decision rule:** approving a loan that is repaid earns 5% of the disbursed amount; approving one that defaults loses 25%; denying a loan earns nothing. Each model's cutoff was set to maximize total profit.
 
-### Dokkan Battle Damage Calculator
-`/Dokkan_Calculator`
+## Results
 
-A survival calculator for *Dragon Ball Z Dokkan Battle* that models whether a unit survives an enemy super attack, built because in-game stat screens don't show the math.
+| Model | Strength |
+| --- | --- |
+| Random Forest | Highest net profit (cutoff 0.43); recommended model |
+| Bagging Tree | Highest F1 score (0.49) |
+| Logistic Regression (Ridge) | Highest recall (0.93), catching the most defaults |
+| Neural Network | Highest precision (0.52), but negative net profit |
 
-- **Models:** enemy attack stacking per action, super-attack DEF boosts, guard, damage reduction, critical hits, and enemy HP and DEF debuffs
-- **Solves backward:** finds the minimum start-of-turn DEF a unit needs to survive a given hit
-- **Scenario analysis:** compares normal hits, crits, and debuffed turns, and finds the exact turn a stacking boss breaks through a unit's defense
-- **Stack:** Python (dataclasses), no dependencies
-- **Run it:** `python dokkan_calculator.py`
+The final Random Forest uses a compact set of predictors (loan amount, SBA-guaranteed amount, revolving credit, loan term, a recession flag, and urban or rural location) and reached 68% accuracy on the validation set. A full summary is in `SBA_Executive Summary.pdf`.
 
-### Pokémon Shiny Hunting Analytics
-`/Pokemon_Shiny_Analytics`
+## Lessons Learned
 
-Data tools behind my personal shiny living-dex tracker (1,100+ of 1,362 forms collected).
+Revisiting this project after graduation, I found an issue worth documenting:
 
-- **Odds analysis (`shiny_odds.py`):** models shiny hunts as a geometric distribution to show the encounters needed for a 50%, 75%, 90%, or 99% chance across hunting methods. Key finding: the median full-odds hunt takes about 2,839 encounters, roughly 31% fewer than the 4,096 average, which is why most hunts end "early" while a few run very long.
-- **Pokédex scraper (`scrape_pokedex.py`):** scrapes national and regional Pokédex lists into CSV as the master list for the tracker, with polite request delays and validation that fails loudly if the page layout changes
-- **Stack:** Python, NumPy, pandas, matplotlib, requests, BeautifulSoup
+**Net profit was measured on the training set instead of the validation set.** Each model's profit and optimal cutoff were calculated from its predictions on the same data it was trained on. That inflates results for flexible models that partly memorize their training data. The final Random Forest shows the gap clearly: 82% accuracy on training data versus 68% on validation data. Tree ensembles and KNN, which overfit most easily, ranked highest on profit, so the recommendation of Random Forest may partly reflect overfitting rather than true out-of-sample performance.
 
-![Shiny odds chart](Pokemon_Shiny_Analytics/shiny_odds.png)
+**What I'd do differently:**
 
-## Skills
+1. Calculate net profit and choose each model's cutoff on the validation set, or better, tune the cutoff with cross-validation and report final profit on a held-out test set that no tuning decision ever touched.
+2. Treat a large gap between training and validation performance as a red flag before comparing models, and regularize or constrain the model (for example, limit tree depth or require more samples per leaf) until the gap narrows.
+3. Compare models on profit per loan or as a share of the best possible profit, which is easier to interpret than a total that depends on how many loans happen to be in a split.
+4. Keep one shared pipeline for splitting, weighting, and scoring so every model is evaluated the same way. With several team members building models in separate notebooks, small differences in setup can creep in.
 
-- **BI and visualization:** Power BI (DAX, Power Query), Tableau, Excel
-- **Data engineering:** SQL Server, Azure Data Factory, Power Automate, ETL design, data modeling, data quality
-- **Programming and analytics:** SQL, Python, R, predictive modeling, machine learning, exploratory data analysis
-- **Tools:** Git, GitHub, AI-assisted development
-
-## Education
-
-- M.S., Business Analytics, California State University, Sacramento (2025)
-- B.S., Management Information Systems, California State University, San Marcos (2020)
-
-## Archive
-
-`/Archive` holds early coursework from my undergraduate program (Java exercises and database design assignments).
+The broader takeaway: choosing a model on a business metric like profit was the right instinct, and it matters just as much *which data* that metric is measured on.
